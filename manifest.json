@@ -1,0 +1,20 @@
+{
+  "manifest_version": 2,
+
+  "name": "SoundCloud Score",
+  "description": "Show the hottest songs in your stream by looking at a song's views, likes, and reposts",
+  "version": "0.1.0",
+
+  "icons": {
+    "16": "sound_16.png",
+    "48": "sound_48.png"
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["*://*.soundcloud.com/*"],
+      "js": ["jquery-3.2.1.min.js", "score.js"]
+    }
+  ]
+
+}
