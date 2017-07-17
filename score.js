@@ -1,19 +1,22 @@
-function mainLoop() {
-  var jsInitTimer = setInterval(checkForSongsLoad, 1000);
+function createObserver() {
+  var observer = new MutationObserver(function(mutations) {
+   mutations.forEach(function(mutation) {
+     var loadedLaterList = $('ul.soundList').get(0);
+     var lazyLoaded = $('ul.lazyLoadingList__list').get(0);
+     if (mutation.type === 'childList' && (mutation.target === loadedLaterList || mutation.target === lazyLoaded)) {
+       mutation.addedNodes.forEach(function(song) {
+         addScore(song);
+       })
+     }
+   })
+  });
+  var target = document.body;
+  var config = {attributes: true, childList: true, subtree: true, characterData: true};
+  observer.observe(target, config);
+}
 
-  function checkForSongsLoad() {
-    var prevLength = 0;
-    if ($(".soundList__item").length) {
-      $.each(getAllSongs(), function(index, song) {
-        if (! hasScore(song)) {
-          addScore(song);
-        }
-      })
-    }
-    else {
-      console.log("Didn't find any songs!");
-    }
-  }
+function isPlaylist(song) {
+  return $(song).find('.compactTrackList')[0];
 }
 
 function hasScore(song) {
@@ -87,12 +90,14 @@ function getAllSongs() {
 }
 
 function addScore(song) {
+  if (!isPlaylist(song)){
     var plays = getPlays(song);
     var reposts = getReposts(song);
     var likes  = getLikes(song);
     var score = calculateSongScore(likes, reposts, plays);
     // createHTMLElementWithScore();
     $(song).find("ul.soundStats").prepend('<li title="score" class="sc-ministats-item"><span class="sc-ministats sc-ministats-small sc-ministats-plays"><span class="sc-visuallyhidden"></span><span aria-hidden="true">' + score + '</span></span></li>');
+  }
 }
 
-mainLoop();
+createObserver();
